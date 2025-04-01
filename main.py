@@ -1,5 +1,7 @@
 import streamlit as st
 from transformers import T5Tokenizer, T5ForConditionalGeneration
+from huggingface_hub import notebook_login
+
 
 # Load the fine-tuned model
 model = T5ForConditionalGeneration.from_pretrained(r"C:\Users\mansi\PycharmProjects\explo\t5_man\t5_man")
@@ -30,3 +32,7 @@ if st.button("Generate Code"):
         st.code(code, language="python")
     else:
         st.warning("Please enter a query to generate code.")
+
+    # Push the model and tokenizer to Hugging Face Hub
+model.push_to_hub("manas2403005/t5-fine-tuned")
+tokenizer.push_to_hub("manas2403005/t5-fine-tuned")

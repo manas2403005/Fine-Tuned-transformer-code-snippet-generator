@@ -5,7 +5,7 @@ from huggingface_hub import notebook_login
 
 # Load the fine-tuned model
 model = T5ForConditionalGeneration.from_pretrained("manas2403005/t5-fine-tuned")
-)
+
 from transformers import AutoTokenizer
 
 tokenizer = AutoTokenizer.from_pretrained("t5-small")  # Change to your model's variant

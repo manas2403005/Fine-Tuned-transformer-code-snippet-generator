@@ -35,5 +35,5 @@ if st.button("Generate Code"):
         st.warning("Please enter a query to generate code.")
 
     # Push the model and tokenizer to Hugging Face Hub
-model.push_to_hub("manas2403005/t5-fine-tuned")
+model.push_to_hub("manas2403005/t5-fine-tuned", exist_ok=True)
 tokenizer.push_to_hub("manas2403005/t5-fine-tuned")

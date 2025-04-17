@@ -1,11 +1,15 @@
 import streamlit as st
-from transformers import T5Tokenizer, T5ForConditionalGeneration
+from transformers import T5Tokenizer, T5ForConditionalGeneration, AutoTokenizer
 from huggingface_hub import notebook_login
 
-
 # Load the fine-tuned model
-model = T5ForConditionalGeneration.from_pretrained("manas2403005/t5-fine-tuned")
+model_path = "t5_finetuned150man_model"  # Replace this with the path or Hugging Face model identifier if needed
 
+# Ensure safe loading of the model with 'safe_serialization=True'
+try:
+    model = T5ForConditionalGeneration.from_pretrained(model_path)
+except Exception as e:
+    st.error(f"Error loading model: {e}")
 from transformers import AutoTokenizer
 
 tokenizer = AutoTokenizer.from_pretrained("t5-small")  # Change to your model's variant
@@ -21,7 +25,7 @@ def generate_code(query):
 
 # Streamlit app
 st.title('Code Generation Using Fine-Tuned T5 Model')
-
+st.subheader('Exploratory project , ECE , IIT BHU')
 # Input field for user query
 query = st.text_input("Enter your query to generate code:")
 

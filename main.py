@@ -1,40 +1,71 @@
 import streamlit as st
-from transformers import T5Tokenizer, T5ForConditionalGeneration, AutoTokenizer
-from huggingface_hub import notebook_login
+from transformers import T5ForConditionalGeneration, AutoTokenizer
+import torch
+import os
 
-# Load the fine-tuned model
-model_path = "t5_finetuned150man_model"  # Replace this with the path or Hugging Face model identifier if needed
+# 🎯 Title and Subheader
+st.title("Code Generation Using Fine-Tuned CodeT5")
+st.subheader("Exploratory project - ECE, IIT BHU")
 
-# Ensure safe loading of the model with 'safe_serialization=True'
+# ✅ Load model
+model_path = "./codet5_ensemblemm_model-20250421T123706Z-001/codet5_ensemblemm_model"
 try:
     model = T5ForConditionalGeneration.from_pretrained(model_path)
+    tokenizer = AutoTokenizer.from_pretrained(model_path)  # Use same tokenizer as model
+    model.eval()
 except Exception as e:
-    st.error(f"Error loading model: {e}")
-from transformers import AutoTokenizer
+    st.error(f"❌ Error loading model/tokenizer: {e}")
+    st.stop()
 
-tokenizer = AutoTokenizer.from_pretrained("t5-small")  # Change to your model's variant
+# 🚀 Inference function
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+model.to(device)
 
 
-# Define a function for inference
-def generate_code(query):
-    query = query.lower()
-    input_text = "generate code: " + query
-    input_ids = tokenizer.encode(input_text,  max_length=128, truncation=True, padding="max_length", return_tensors="pt")
-    outputs = model.generate(input_ids, max_length=128, num_beams=4, early_stopping=True)
-    return tokenizer.decode(outputs[0], skip_special_tokens=True)
+def generate_code(query, max_length=256, num_beams=5):
+    input_text = "generate code: " + query.lower()
+    inputs = tokenizer(input_text, return_tensors="pt", truncation=True, padding=True).to(device)
 
-# Streamlit app
-st.title('Code Generation Using Fine-Tuned T5 Model')
-st.subheader('Exploratory project , ECE , IIT BHU')
-# Input field for user query
-query = st.text_input("Enter your query to generate code:")
+    with torch.no_grad():
+        generated_ids = model.generate(
+            input_ids=inputs.input_ids,
+            attention_mask=inputs.attention_mask,
+            max_length=max_length,
+            do_sample=True,
+            temperature=0.7,
+            top_k=50,
+            top_p=0.9,
+            num_return_sequences=1
+        )
 
-# Button to trigger code generation
+    output = tokenizer.decode(generated_ids[0], skip_special_tokens=True)
+    return output.strip()
+
+
+# 🎯 Example prompts
+example_queries = [
+    "create a 2x2 numpy matrix and subtract another matrix",
+    "sort a list using bubble sort",
+    " program to remove a key from a dictionary",
+    "program to get the length of an array. ",
+    "reverse a string in python"
+]
+
+# 📥 User input area
+query_option = st.selectbox("Choose an example or write your own query:", [""] + example_queries)
+custom_query = st.text_input("Enter your own query:", value=query_option)
+
+# ▶️ Generate button
 if st.button("Generate Code"):
-    if query:
-        code = generate_code(query)
-        st.subheader("Generated Code:")
-        st.code(code, language="python")
+    if custom_query.strip():
+        with st.spinner("Generating code..."):
+            generated_code = generate_code(custom_query)
+
+        # 🧹 Clean and format output
+        formatted_code = generated_code.strip().replace('\r\n', '\n').replace('\r', '\n')
+
+        # ✅ Display the formatted code
+        st.subheader("💡 Generated Code:")
+        st.code(formatted_code, language="python")
     else:
         st.warning("Please enter a query to generate code.")
-

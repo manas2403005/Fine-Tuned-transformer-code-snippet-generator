@@ -46,48 +46,24 @@ We used Hugging Face's Trainer API for training and implemented temperature-base
 
 These scores reflect the model’s ability to capture semantic similarity and functional correctness, despite variations in implementation.
 
-## Sample Output
+##Streamlit App
+- The web interface includes:
+- Input field for custom queries
+- Dropdown of example problems
+- Syntax-highlighted code output
+- Error handling for generation failures
 
-**Query:** Find the smallest element in the array  
-**Generated Code:**
-```python
-arr = []
-size = int(input("Enter_the_size_of_the_array:"))
-print("Enter_the_elements_of_the_array:")
-for i in range(0, size):
-    num = int(input())
-    arr.append(num)
+##Limitations
+- Low exact match score due to multiple valid solutions
+- Code quality may vary for complex or ambiguous queries
+- Performance degrades on domain-specific tasks underrepresented in training data
 
-print("Smallest_element_in_array_is:", min(arr)) 
+##Future Work
+- Expand dataset with more diverse tasks
+- Add runtime validation for generated code
+- Support for multiple programming languages
+- Apply parameter-efficient fine-tuning techniques (e.g., LoRA)
+- Incorporate human feedback to refine model behavior
 
-Streamlit App
-The web interface includes:
-
-Input field for custom queries
-
-Dropdown of example problems
-
-Syntax-highlighted code output
-
-Error handling for generation failures
-
-Limitations
-Low exact match score due to multiple valid solutions
-
-Code quality may vary for complex or ambiguous queries
-
-Performance degrades on domain-specific tasks underrepresented in training data
-
-Future Work
-Expand dataset with more diverse tasks
-
-Add runtime validation for generated code
-
-Support for multiple programming languages
-
-Apply parameter-efficient fine-tuning techniques (e.g., LoRA)
-
-Incorporate human feedback to refine model behavior
-
-Citation
+##Citation
 This work was developed as part of an exploratory project (Jan–Apr 2025) at the Department of Electronics Engineering, IIT (BHU), Varanasi.
